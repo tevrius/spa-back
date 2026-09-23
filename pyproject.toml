@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=75,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warehouse-ai"
+version = "0.1.0"
+description = "Deterministic warehouse accounting and purchase planning API"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "fastapi==0.115.12",
+  "uvicorn==0.34.2",
+  "SQLAlchemy==2.0.40",
+  "psycopg[binary]==3.2.6",
+  "alembic==1.15.2",
+  "pydantic==2.11.4",
+  "pydantic-settings==2.9.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.5", "httpx==0.28.1", "ruff==0.11.8"]
+
+[tool.setuptools.packages.find]
+include = ["app*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["integration: requires a dedicated PostgreSQL test database"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/api/routes.py" = ["B008"]
