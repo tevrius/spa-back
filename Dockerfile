@@ -15,5 +15,6 @@ FROM runtime AS test
 USER root
 RUN pip install '.[dev]'
 COPY tests ./tests
+COPY docs ./docs
 USER warehouse
 CMD ["pytest", "-p", "no:cacheprovider"]

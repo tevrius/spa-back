@@ -9,7 +9,9 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
+from app.api.documentation import DESCRIPTION, TAGS, error_responses, success_response
 from app.api.routes import router
+from app.api.schemas import LiveStatus, ReadyStatus
 from app.domain.errors import DomainError
 from app.infrastructure.database import session_factory
 
@@ -17,9 +19,9 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Warehouse Purchase Planning API",
     version="0.1.0",
-    description=(
-        "Складской учёт по FEFO и детерминированное планирование закупок. Демо без авторизации."
-    ),
+    description=DESCRIPTION,
+    openapi_tags=TAGS,
+    servers=[{"url": "/", "description": "Текущий сервер API"}],
 )
 app.include_router(router)
 
@@ -59,12 +61,28 @@ async def database_unavailable(request: Request, exc: OperationalError):
     return error_response(503, "database_unavailable", "Database temporarily unavailable", {})
 
 
-@app.get("/health/live", tags=["health"])
+@app.get(
+    "/health/live",
+    tags=["health"],
+    response_model=LiveStatus,
+    summary="Проверить процесс",
+    operation_id="getLiveness",
+    description="Не обращается к базе данных. Подтверждает, что процесс отвечает по HTTP.",
+    responses={200: success_response("Процесс работает", {"status": "ok"})},
+)
 def live():
     return {"status": "ok"}
 
 
-@app.get("/health/ready", tags=["health"])
+@app.get(
+    "/health/ready",
+    tags=["health"],
+    response_model=ReadyStatus,
+    summary="Проверить готовность базы",
+    operation_id="getReadiness",
+    description="Проверяет подключение к PostgreSQL и наличие таблицы alembic_version.",
+    responses={**error_responses(503), 200: success_response("База доступна", {"status": "ready"})},
+)
 def ready():
     with session_factory()() as session:
         session.execute(text("SELECT 1"))

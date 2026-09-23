@@ -19,6 +19,7 @@ docker compose up
 
 - Swagger: http://localhost:8000/docs
 - OpenAPI: http://localhost:8000/openapi.json
+- ReDoc: http://localhost:8000/redoc
 - Проверка БД и миграций: http://localhost:8000/health/ready
 - Проверка процесса: http://localhost:8000/health/live
 
@@ -26,6 +27,13 @@ docker compose up
 Остановка: `docker compose stop`. База сохраняется в именованном томе.
 Повторный запуск не дублирует seed и не сдвигает его даты.
 PostgreSQL не публикует порт на хост, API привязан к loopback.
+
+## OpenAPI-документация
+
+Спецификация OpenAPI 3.1 сохранена в [docs/openapi.json](docs/openapi.json).
+В ней описаны все операции, параметры, бизнес-правила, примеры запросов/ответов
+и ошибки. Подходит для импорта в Postman/Insomnia и генерации клиентов.
+Порядок просмотра, обновления и проверки: [docs/README.md](docs/README.md).
 
 ## Тесты и стиль
 

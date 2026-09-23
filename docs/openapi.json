@@ -1,0 +1,2541 @@
+{
+  "components": {
+    "schemas": {
+      "AlertOut": {
+        "properties": {
+          "batch": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Партия для предупреждения о годности; иначе null.",
+            "title": "Batch"
+          },
+          "code": {
+            "description": "Стабильный машинный код для обработки клиентом.",
+            "title": "Code",
+            "type": "string"
+          },
+          "level": {
+            "description": "Важность: info — информация, warning — внимание, critical — высокий риск.",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "title": "Location"
+          },
+          "message": {
+            "description": "Человекочитаемое сообщение.",
+            "title": "Message",
+            "type": "string"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "description": "Показатели и пороги конкретного предупреждения; набор ключей зависит от code.",
+            "title": "Metrics",
+            "type": "object"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "level",
+          "message",
+          "sku",
+          "location",
+          "metrics"
+        ],
+        "title": "AlertOut",
+        "type": "object"
+      },
+      "AlertPage": {
+        "properties": {
+          "items": {
+            "description": "Записи текущей страницы.",
+            "items": {
+              "$ref": "#/components/schemas/AlertOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "description": "Размер страницы (1–100, по умолчанию 50).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Количество пропущенных записей, начиная с 0.",
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "description": "Число записей после фильтров, до пагинации.",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "limit",
+          "offset",
+          "total"
+        ],
+        "title": "AlertPage",
+        "type": "object"
+      },
+      "AllocationOut": {
+        "properties": {
+          "batch": {
+            "description": "Код партии в рамках SKU и объекта.",
+            "title": "Batch",
+            "type": "string"
+          },
+          "quantity_delta": {
+            "description": "Знаковое изменение остатка партии: расход отрицательный, приход положительный.",
+            "title": "Quantity Delta",
+            "type": "number"
+          }
+        },
+        "required": [
+          "batch",
+          "quantity_delta"
+        ],
+        "title": "AllocationOut",
+        "type": "object"
+      },
+      "BatchOut": {
+        "properties": {
+          "batch": {
+            "description": "Код партии в рамках товара и объекта.",
+            "title": "Batch",
+            "type": "string"
+          },
+          "current_stock": {
+            "description": "Учётный остаток из движений, включая ещё не списанную просрочку.",
+            "title": "Current Stock",
+            "type": "number"
+          },
+          "expired": {
+            "description": "Истёк ли срок годности на дату запроса.",
+            "title": "Expired",
+            "type": "boolean"
+          },
+          "expires_on": {
+            "description": "Срок годности включительно. У новой партии не раньше даты поступления.",
+            "format": "date",
+            "title": "Expires On",
+            "type": "string"
+          },
+          "receipt_documents": {
+            "description": "Номера приходных документов этой партии в хронологическом порядке.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Receipt Documents",
+            "type": "array"
+          },
+          "received_on": {
+            "description": "Дата первого поступления партии.",
+            "format": "date",
+            "title": "Received On",
+            "type": "string"
+          },
+          "unit_price": {
+            "description": "Цена единицы в RUB, до 2 десятичных знаков. В прогнозе null, если нет цены поступления.",
+            "title": "Unit Price",
+            "type": "number"
+          }
+        },
+        "required": [
+          "batch",
+          "current_stock",
+          "expires_on",
+          "received_on",
+          "unit_price",
+          "receipt_documents",
+          "expired"
+        ],
+        "title": "BatchOut",
+        "type": "object"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "description": "Стабильный машинный код для обработки клиентом.",
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "description": "Подробности ошибки: доступное количество, дата или список ошибок валидации.",
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "description": "Человекочитаемое сообщение.",
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody",
+            "description": "Единый объект ошибки API."
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Explanation": {
+        "properties": {
+          "as_of": {
+            "description": "Бизнес-дата, на которую выполнен расчёт.",
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "assumptions": {
+            "description": "Допущения и ограничения модели.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "data_used": {
+            "description": "Источники и окно данных, использованные при расчёте.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Data Used",
+            "type": "array"
+          },
+          "formulas": {
+            "description": "Формулы расчёта и округления.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Formulas",
+            "type": "array"
+          },
+          "inputs": {
+            "additionalProperties": true,
+            "description": "Исходные показатели и промежуточные значения; точные дроби могут быть строками вида 1/90.",
+            "title": "Inputs",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data_used",
+          "formulas",
+          "assumptions",
+          "as_of",
+          "inputs"
+        ],
+        "title": "Explanation",
+        "type": "object"
+      },
+      "ForecastIn": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "days": {
+                "type": "integer"
+              },
+              "months": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "days"
+            ]
+          },
+          {
+            "properties": {
+              "days": {
+                "type": "null"
+              },
+              "months": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "months"
+            ]
+          }
+        ],
+        "properties": {
+          "days": {
+            "anyOf": [
+              {
+                "maximum": 366.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Горизонт 1–366 дней. Укажите days или months, но не оба.",
+            "title": "Days"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Location",
+            "type": "string"
+          },
+          "months": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Горизонт 1–12 календарных месяцев, альтернативный days.",
+            "title": "Months"
+          },
+          "safety_stock_days": {
+            "default": 14,
+            "description": "Страховой запас в днях среднего расхода.",
+            "maximum": 366.0,
+            "minimum": 0.0,
+            "title": "Safety Stock Days",
+            "type": "integer"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Sku",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Начало периода: сегодня по умолчанию; не раньше сегодня и не далее 366 дней.",
+            "title": "Start Date"
+          }
+        },
+        "required": [
+          "sku",
+          "location"
+        ],
+        "title": "ForecastIn",
+        "type": "object"
+      },
+      "ForecastOut": {
+        "properties": {
+          "available_stock": {
+            "description": "Пригодный для расхода остаток, исключая просроченные партии.",
+            "title": "Available Stock",
+            "type": "number"
+          },
+          "avg_daily_consumption": {
+            "description": "Расход consume за последние 90 полных дней / 90, показан до 0.001.",
+            "title": "Avg Daily Consumption",
+            "type": "number"
+          },
+          "current_stock": {
+            "description": "Учётный остаток из движений, включая ещё не списанную просрочку.",
+            "title": "Current Stock",
+            "type": "number"
+          },
+          "estimated_cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Закупка × цена, HALF_UP до копеек; null при неизвестной цене.",
+            "title": "Estimated Cost"
+          },
+          "explanation": {
+            "$ref": "#/components/schemas/Explanation",
+            "description": "Исходные данные, формулы и допущения расчёта."
+          },
+          "forecast_demand": {
+            "description": "Средний расход × дни выбранного периода; не включает промежуток до start_date.",
+            "title": "Forecast Demand",
+            "type": "number"
+          },
+          "incoming_qty": {
+            "description": "Неполученные части открытых поставок от as_of до конца периода, включая до start_date.",
+            "title": "Incoming Qty",
+            "type": "number"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "title": "Location",
+            "type": "string"
+          },
+          "name": {
+            "description": "Название товара.",
+            "title": "Name",
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Period",
+            "description": "Выбранный календарный период прогноза."
+          },
+          "recommended_order_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Рекомендуемая дата заказа, не раньше as_of; null при нулевой закупке.",
+            "title": "Recommended Order Date"
+          },
+          "recommended_purchase_qty": {
+            "description": "Неотрицательная потребность, округлённая вверх до упаковки и минимального заказа.",
+            "title": "Recommended Purchase Qty",
+            "type": "number"
+          },
+          "reorder_point": {
+            "description": "Средний расход × (срок поставки + страховые дни).",
+            "title": "Reorder Point",
+            "type": "number"
+          },
+          "safety_stock": {
+            "description": "Средний расход × safety_stock_days.",
+            "title": "Safety Stock",
+            "type": "number"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          },
+          "stockout_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Первый день непокрытого спроса без новой закупки; null, если не найден до конца горизонта.",
+            "title": "Stockout Date"
+          },
+          "unit": {
+            "description": "Единица измерения количества товара.",
+            "title": "Unit",
+            "type": "string"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Цена единицы в RUB, до 2 десятичных знаков. В прогнозе null, если нет цены поступления.",
+            "title": "Unit Price"
+          },
+          "warnings": {
+            "description": "Предупреждения о дефиците и ограничениях исходных данных.",
+            "items": {
+              "$ref": "#/components/schemas/WarningOut"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sku",
+          "name",
+          "unit",
+          "location",
+          "period",
+          "avg_daily_consumption",
+          "forecast_demand",
+          "current_stock",
+          "available_stock",
+          "incoming_qty",
+          "safety_stock",
+          "reorder_point",
+          "recommended_purchase_qty",
+          "unit_price",
+          "estimated_cost",
+          "recommended_order_date",
+          "stockout_date",
+          "explanation",
+          "warnings"
+        ],
+        "title": "ForecastOut",
+        "type": "object"
+      },
+      "LiveStatus": {
+        "properties": {
+          "status": {
+            "const": "ok",
+            "description": "Процесс обслуживает HTTP-запросы.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "LiveStatus",
+        "type": "object"
+      },
+      "LocationStock": {
+        "properties": {
+          "available_stock": {
+            "description": "Пригодный для расхода остаток, исключая просроченные партии.",
+            "title": "Available Stock",
+            "type": "number"
+          },
+          "avg_daily_consumption": {
+            "description": "Расход consume за последние 90 полных дней / 90, показан до 0.001.",
+            "title": "Avg Daily Consumption",
+            "type": "number"
+          },
+          "batches": {
+            "description": "Партии объекта, включая партии с нулевым остатком.",
+            "items": {
+              "$ref": "#/components/schemas/BatchOut"
+            },
+            "title": "Batches",
+            "type": "array"
+          },
+          "current_stock": {
+            "description": "Учётный остаток из движений, включая ещё не списанную просрочку.",
+            "title": "Current Stock",
+            "type": "number"
+          },
+          "days_of_stock": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Доступный остаток / средний расход; null при нулевом расходе.",
+            "title": "Days Of Stock"
+          },
+          "expired_stock": {
+            "description": "Просроченный остаток, требующий отдельной операции writeoff.",
+            "title": "Expired Stock",
+            "type": "number"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "title": "Location",
+            "type": "string"
+          },
+          "name": {
+            "description": "Название товара.",
+            "title": "Name",
+            "type": "string"
+          },
+          "nearest_expiry": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ближайшая годность партии с положительным остатком, включая просроченные; null при отсутствии.",
+            "title": "Nearest Expiry"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          },
+          "unit": {
+            "description": "Единица измерения количества товара.",
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sku",
+          "name",
+          "unit",
+          "location",
+          "current_stock",
+          "available_stock",
+          "expired_stock",
+          "avg_daily_consumption",
+          "days_of_stock",
+          "nearest_expiry",
+          "batches"
+        ],
+        "title": "LocationStock",
+        "type": "object"
+      },
+      "MovementCreated": {
+        "properties": {
+          "allocations": {
+            "description": "Распределение движения по партиям. Может пересчитаться при операции задним числом.",
+            "items": {
+              "$ref": "#/components/schemas/AllocationOut"
+            },
+            "title": "Allocations",
+            "type": "array"
+          },
+          "available_stock": {
+            "description": "Пригодный для расхода остаток, исключая просроченные партии.",
+            "title": "Available Stock",
+            "type": "number"
+          },
+          "current_stock": {
+            "description": "Учётный остаток из движений, включая ещё не списанную просрочку.",
+            "title": "Current Stock",
+            "type": "number"
+          },
+          "date": {
+            "description": "Дата операции YYYY-MM-DD, не позже бизнес-даты в APP_TIMEZONE.",
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "document_number": {
+            "description": "Глобально уникальный номер документа одного движения. Повторная загрузка — 409.",
+            "title": "Document Number",
+            "type": "string"
+          },
+          "id": {
+            "description": "Идентификатор зарегистрированного движения.",
+            "title": "Id",
+            "type": "integer"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "title": "Location",
+            "type": "string"
+          },
+          "operation": {
+            "description": "receipt — приход; consume — FEFO-расход; return — возврат на склад; writeoff — списание; correction — знаковое изменение.",
+            "enum": [
+              "receipt",
+              "consume",
+              "writeoff",
+              "return",
+              "correction"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "quantity": {
+            "description": "Количество в единице товара, до 3 знаков после запятой. Ненулевое; отрицательное только у correction.",
+            "title": "Quantity",
+            "type": "number"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "date",
+          "sku",
+          "location",
+          "operation",
+          "quantity",
+          "document_number",
+          "allocations",
+          "current_stock",
+          "available_stock"
+        ],
+        "title": "MovementCreated",
+        "type": "object"
+      },
+      "MovementIn": {
+        "additionalProperties": false,
+        "properties": {
+          "batch": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Обязательна кроме consume; consume выбирает партии автоматически.",
+            "title": "Batch"
+          },
+          "date": {
+            "description": "Дата операции YYYY-MM-DD, не позже бизнес-даты в APP_TIMEZONE.",
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "document_number": {
+            "description": "Глобально уникальный номер документа. Повторная загрузка — 409.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Document Number",
+            "type": "string"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Обязательна для новой партии receipt; годность включительно.",
+            "title": "Expires On"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Location",
+            "type": "string"
+          },
+          "operation": {
+            "description": "receipt — приход; consume — FEFO-расход; return — возврат на склад; writeoff — списание; correction — знаковое изменение.",
+            "enum": [
+              "receipt",
+              "consume",
+              "writeoff",
+              "return",
+              "correction"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Количество в единице товара, до 3 знаков после запятой. Ненулевое; отрицательное только у correction.",
+            "title": "Quantity"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Sku",
+            "type": "string"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Цена в RUB, обязательна для новой партии receipt.",
+            "title": "Unit Price"
+          }
+        },
+        "required": [
+          "date",
+          "sku",
+          "location",
+          "operation",
+          "quantity",
+          "document_number"
+        ],
+        "title": "MovementIn",
+        "type": "object"
+      },
+      "MovementOut": {
+        "properties": {
+          "allocations": {
+            "description": "Распределение движения по партиям. Может пересчитаться при операции задним числом.",
+            "items": {
+              "$ref": "#/components/schemas/AllocationOut"
+            },
+            "title": "Allocations",
+            "type": "array"
+          },
+          "date": {
+            "description": "Дата операции YYYY-MM-DD, не позже бизнес-даты в APP_TIMEZONE.",
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "document_number": {
+            "description": "Глобально уникальный номер документа одного движения. Повторная загрузка — 409.",
+            "title": "Document Number",
+            "type": "string"
+          },
+          "id": {
+            "description": "Идентификатор зарегистрированного движения.",
+            "title": "Id",
+            "type": "integer"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "title": "Location",
+            "type": "string"
+          },
+          "operation": {
+            "description": "receipt — приход; consume — FEFO-расход; return — возврат на склад; writeoff — списание; correction — знаковое изменение.",
+            "enum": [
+              "receipt",
+              "consume",
+              "writeoff",
+              "return",
+              "correction"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "quantity": {
+            "description": "Количество в единице товара, до 3 знаков после запятой. Ненулевое; отрицательное только у correction.",
+            "title": "Quantity",
+            "type": "number"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "date",
+          "sku",
+          "location",
+          "operation",
+          "quantity",
+          "document_number",
+          "allocations"
+        ],
+        "title": "MovementOut",
+        "type": "object"
+      },
+      "MovementPage": {
+        "properties": {
+          "items": {
+            "description": "Записи текущей страницы.",
+            "items": {
+              "$ref": "#/components/schemas/MovementOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "description": "Размер страницы (1–100, по умолчанию 50).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Количество пропущенных записей, начиная с 0.",
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "description": "Число записей после фильтров, до пагинации.",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "limit",
+          "offset",
+          "total"
+        ],
+        "title": "MovementPage",
+        "type": "object"
+      },
+      "Period": {
+        "properties": {
+          "days": {
+            "description": "Количество календарных дней периода.",
+            "title": "Days",
+            "type": "integer"
+          },
+          "from": {
+            "description": "Первый день периода включительно.",
+            "format": "date",
+            "title": "From",
+            "type": "string"
+          },
+          "to": {
+            "description": "Последний день периода включительно.",
+            "format": "date",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "days"
+        ],
+        "title": "Period",
+        "type": "object"
+      },
+      "ReadyStatus": {
+        "properties": {
+          "status": {
+            "const": "ready",
+            "description": "Доступны БД и таблица версии миграций.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "ReadyStatus",
+        "type": "object"
+      },
+      "StockDetail": {
+        "properties": {
+          "locations": {
+            "description": "Объекты с партиями товара. Пустой массив, если партий нет.",
+            "items": {
+              "$ref": "#/components/schemas/LocationStock"
+            },
+            "title": "Locations",
+            "type": "array"
+          },
+          "name": {
+            "description": "Название товара.",
+            "title": "Name",
+            "type": "string"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          },
+          "unit": {
+            "description": "Единица измерения количества товара.",
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sku",
+          "name",
+          "unit",
+          "locations"
+        ],
+        "title": "StockDetail",
+        "type": "object"
+      },
+      "StockOut": {
+        "properties": {
+          "available_stock": {
+            "description": "Пригодный для расхода остаток, исключая просроченные партии.",
+            "title": "Available Stock",
+            "type": "number"
+          },
+          "avg_daily_consumption": {
+            "description": "Расход consume за последние 90 полных дней / 90, показан до 0.001.",
+            "title": "Avg Daily Consumption",
+            "type": "number"
+          },
+          "current_stock": {
+            "description": "Учётный остаток из движений, включая ещё не списанную просрочку.",
+            "title": "Current Stock",
+            "type": "number"
+          },
+          "days_of_stock": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Доступный остаток / средний расход; null при нулевом расходе.",
+            "title": "Days Of Stock"
+          },
+          "expired_stock": {
+            "description": "Просроченный остаток, требующий отдельной операции writeoff.",
+            "title": "Expired Stock",
+            "type": "number"
+          },
+          "location": {
+            "description": "Код объекта хранения, например MS-01. null у предупреждения без привязки к объекту.",
+            "title": "Location",
+            "type": "string"
+          },
+          "name": {
+            "description": "Название товара.",
+            "title": "Name",
+            "type": "string"
+          },
+          "nearest_expiry": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ближайшая годность партии с положительным остатком, включая просроченные; null при отсутствии.",
+            "title": "Nearest Expiry"
+          },
+          "sku": {
+            "description": "Уникальный артикул товара, например OIL-001.",
+            "title": "Sku",
+            "type": "string"
+          },
+          "unit": {
+            "description": "Единица измерения количества товара.",
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sku",
+          "name",
+          "unit",
+          "location",
+          "current_stock",
+          "available_stock",
+          "expired_stock",
+          "avg_daily_consumption",
+          "days_of_stock",
+          "nearest_expiry"
+        ],
+        "title": "StockOut",
+        "type": "object"
+      },
+      "StockPage": {
+        "properties": {
+          "items": {
+            "description": "Записи текущей страницы.",
+            "items": {
+              "$ref": "#/components/schemas/StockOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "description": "Размер страницы (1–100, по умолчанию 50).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Количество пропущенных записей, начиная с 0.",
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "description": "Число записей после фильтров, до пагинации.",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "limit",
+          "offset",
+          "total"
+        ],
+        "title": "StockPage",
+        "type": "object"
+      },
+      "WarningOut": {
+        "properties": {
+          "code": {
+            "description": "Стабильный машинный код для обработки клиентом.",
+            "title": "Code",
+            "type": "string"
+          },
+          "level": {
+            "description": "Важность: info — информация, warning — внимание, critical — высокий риск.",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "message": {
+            "description": "Человекочитаемое сообщение.",
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "level",
+          "message"
+        ],
+        "title": "WarningOut",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "\nREST API складского учёта и планирования закупок для спа-оператора.\n\n## Правила работы\n- Авторизация в локальном MVP не требуется. Не публикуйте сервис в интернет без неё.\n- Даты — `YYYY-MM-DD`, бизнес-дата определяется `APP_TIMEZONE` (Europe/Moscow).\n  В примерах даты фиксированы: перед отправкой замените дату движения на сегодня\n  или прошлую дату, а срок новой партии — на подходящую будущую дату.\n- Количества: до 3 знаков после запятой, цена: до 2, валюта: RUB.\n  Основные поля ответов — JSON-числа; точные промежуточные значения и ошибки\n  могут содержать десятичные строки или рациональные числа вида `1/90`.\n- `current_stock` включает ещё не списанную просрочку; `available_stock` её исключает.\n- Расход — FEFO: ближайшая годность, дата первого прихода, ID партии.\n  Товар пригоден по дату годности включительно.\n- Номер документа глобально уникален. Повторная отправка возвращает 409,\n  а не результат первого запроса. Запись атомарна.\n- Списки возвращают `items`, `limit`, `offset`, `total`; total — число после фильтрации,\n  до пагинации. Результат одного запроса читается из согласованного снимка БД.\n\n## Быстрая проверка\n1. `GET /api/stock` — демоостатки OIL-001 / MS-01.\n2. `POST /api/movements` — приход с новым document_number, затем расход.\n3. `GET /api/stock/OIL-001` — партии и приходные документы.\n4. `POST /api/forecast` — горизонт days **или** months.\n5. `GET /api/alerts` — риски и показатели, на которых они основаны.\n\nSwagger: `/docs`, ReDoc: `/redoc`, машинная спецификация OpenAPI 3.1: `/openapi.json`.\n",
+    "title": "Warehouse Purchase Planning API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/alerts": {
+      "get": {
+        "description": "Коды: stock_shortage, expiring_batch, expired_batch, no_movement, never_moved. Дефицит: available_stock < средний расход × срок поставки, без входящих заказов. Пороги годности и бездействия заданы EXPIRY_WARNING_DAYS и INACTIVITY_DAYS. never_moved имеет location = null и возвращается только без фильтра объекта. Порядок: critical, warning, info; затем SKU, объект, код, партия.",
+        "operationId": "listAlerts",
+        "parameters": [
+          {
+            "description": "Фильтр по SKU. Неизвестный SKU — 404.",
+            "in": "query",
+            "name": "sku",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по SKU. Неизвестный SKU — 404.",
+              "examples": [
+                "OIL-001"
+              ],
+              "title": "Sku"
+            }
+          },
+          {
+            "description": "Код объекта. Неизвестный код — 404.",
+            "in": "query",
+            "name": "location",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Код объекта. Неизвестный код — 404.",
+              "examples": [
+                "MS-01"
+              ],
+              "title": "Location"
+            }
+          },
+          {
+            "description": "Размер страницы; total не зависит от limit.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "description": "Размер страницы; total не зависит от limit.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Количество пропущенных записей после фильтрации.",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Количество пропущенных записей после фильтрации.",
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "items": [
+                    {
+                      "batch": "MASK-EXPIRED",
+                      "code": "expired_batch",
+                      "level": "critical",
+                      "location": "MS-01",
+                      "message": "Партия просрочена: требуется writeoff",
+                      "metrics": {
+                        "days_to_expiry": -1,
+                        "expires_on": "2026-09-22",
+                        "remaining_quantity": "4.000",
+                        "threshold_days": 30
+                      },
+                      "sku": "MASK-001"
+                    }
+                  ],
+                  "limit": 50,
+                  "offset": 0,
+                  "total": 1
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/AlertPage"
+                }
+              }
+            },
+            "description": "Страница предупреждений с исходными показателями"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "SKU, объект или запрошенная партия не найдены",
+                    "value": {
+                      "error": {
+                        "code": "unknown_sku",
+                        "details": {
+                          "sku": "UNKNOWN"
+                        },
+                        "message": "SKU does not exist"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SKU, объект или запрошенная партия не найдены"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Невалидные поля или нарушение бизнес-правил",
+                    "value": {
+                      "error": {
+                        "code": "validation_error",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                "quantity"
+                              ],
+                              "message": "Invalid quantity",
+                              "type": "value_error"
+                            }
+                          ]
+                        },
+                        "message": "Request validation failed"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Невалидные поля или нарушение бизнес-правил"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Получить предупреждения склада",
+        "tags": [
+          "alerts"
+        ]
+      }
+    },
+    "/api/forecast": {
+      "post": {
+        "description": "Расчёт без изменения БД. Передайте ровно один горизонт: days или months. Месяцы календарные, конец периода включён. При отложенном start_date учитывается дефицит до начала периода. Календарная модель учитывает FEFO, истечение годности и даты неполученных открытых поставок; просроченные поставки исключены. Закупка покрывает непокрытый спрос и страховой запас, округляется до упаковки и минимального заказа. Цена последнего поступления; при её отсутствии стоимость null. stockout_date показана без новой закупки только в пределах горизонта. explanation содержит исходные данные, формулы и ограничения модели.",
+        "operationId": "calculateForecast",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "days": {
+                  "summary": "На 30 дней со страховым запасом 14 дней",
+                  "value": {
+                    "days": 30,
+                    "location": "MS-01",
+                    "safety_stock_days": 14,
+                    "sku": "OIL-001"
+                  }
+                },
+                "deferred": {
+                  "summary": "Отложенное начало периода",
+                  "value": {
+                    "location": "MS-01",
+                    "months": 3,
+                    "safety_stock_days": 14,
+                    "sku": "OIL-001",
+                    "start_date": "2026-10-01"
+                  }
+                },
+                "months": {
+                  "summary": "На три календарных месяца",
+                  "value": {
+                    "location": "MS-01",
+                    "months": 3,
+                    "safety_stock_days": 14,
+                    "sku": "OIL-001"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ForecastIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "available_stock": 10,
+                  "avg_daily_consumption": 1,
+                  "current_stock": 10,
+                  "estimated_cost": 439.25,
+                  "explanation": {
+                    "as_of": "2026-09-23",
+                    "assumptions": [
+                      "Постоянный спрос; цена последнего поступления; валюта RUB"
+                    ],
+                    "data_used": [
+                      "Расход 90 единиц за 90 полных дней; запас 10"
+                    ],
+                    "formulas": [
+                      "D = 90 / 90 = 1",
+                      "ROP = 1 × (7 + 14) = 21",
+                      "Qraw = 30 + 14 − 10 = 34",
+                      "Q = ceil(max(34, 10) / 5) × 5 = 35"
+                    ],
+                    "inputs": {
+                      "daily_rate_exact": "1",
+                      "history_consumption": "90",
+                      "lead_time_days": 7,
+                      "minimum_order": "10",
+                      "pack_size": "5",
+                      "required_before_rounding": "34"
+                    }
+                  },
+                  "forecast_demand": 30,
+                  "incoming_qty": 0,
+                  "location": "MS-01",
+                  "name": "Массажное масло",
+                  "period": {
+                    "days": 30,
+                    "from": "2026-09-23",
+                    "to": "2026-10-22"
+                  },
+                  "recommended_order_date": "2026-09-23",
+                  "recommended_purchase_qty": 35,
+                  "reorder_point": 21,
+                  "safety_stock": 14,
+                  "sku": "OIL-001",
+                  "stockout_date": "2026-10-03",
+                  "unit": "л",
+                  "unit_price": 12.55,
+                  "warnings": [
+                    {
+                      "code": "below_reorder_point",
+                      "level": "warning",
+                      "message": "Остаток ниже точки заказа"
+                    },
+                    {
+                      "code": "projected_shortage",
+                      "level": "critical",
+                      "message": "Без закупки возникнет дефицит"
+                    }
+                  ]
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastOut"
+                }
+              }
+            },
+            "description": "Рекомендация и объяснение без размещения заказа"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Некорректный синтаксис JSON",
+                    "value": {
+                      "error": {
+                        "code": "invalid_json",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                1
+                              ],
+                              "message": "JSON decode error",
+                              "type": "json_invalid"
+                            }
+                          ]
+                        },
+                        "message": "Malformed JSON"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Некорректный синтаксис JSON"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "SKU, объект или запрошенная партия не найдены",
+                    "value": {
+                      "error": {
+                        "code": "unknown_sku",
+                        "details": {
+                          "sku": "UNKNOWN"
+                        },
+                        "message": "SKU does not exist"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SKU, объект или запрошенная партия не найдены"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Невалидные поля или нарушение бизнес-правил",
+                    "value": {
+                      "error": {
+                        "code": "validation_error",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                "quantity"
+                              ],
+                              "message": "Invalid quantity",
+                              "type": "value_error"
+                            }
+                          ]
+                        },
+                        "message": "Request validation failed"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Невалидные поля или нарушение бизнес-правил"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Рассчитать потребность в закупке",
+        "tags": [
+          "forecast"
+        ]
+      }
+    },
+    "/api/movements": {
+      "get": {
+        "description": "Фильтры объединяются через AND. Границы дат включены. Порядок: дата и ID убыванию.",
+        "operationId": "listMovements",
+        "parameters": [
+          {
+            "description": "Фильтр по SKU. Неизвестный SKU — 404.",
+            "in": "query",
+            "name": "sku",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по SKU. Неизвестный SKU — 404.",
+              "examples": [
+                "OIL-001"
+              ],
+              "title": "Sku"
+            }
+          },
+          {
+            "description": "Код объекта. Неизвестный код — 404.",
+            "in": "query",
+            "name": "location",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Код объекта. Неизвестный код — 404.",
+              "examples": [
+                "MS-01"
+              ],
+              "title": "Location"
+            }
+          },
+          {
+            "description": "Тип складской операции.",
+            "in": "query",
+            "name": "operation",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "receipt",
+                    "consume",
+                    "writeoff",
+                    "return",
+                    "correction"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Тип складской операции.",
+              "title": "Operation"
+            }
+          },
+          {
+            "description": "Начальная дата включительно.",
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Начальная дата включительно.",
+              "title": "Date From"
+            }
+          },
+          {
+            "description": "Конечная дата включительно; не раньше date_from.",
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Конечная дата включительно; не раньше date_from.",
+              "title": "Date To"
+            }
+          },
+          {
+            "description": "Размер страницы; total не зависит от limit.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "description": "Размер страницы; total не зависит от limit.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Количество пропущенных записей после фильтрации.",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Количество пропущенных записей после фильтрации.",
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "items": [
+                    {
+                      "allocations": [
+                        {
+                          "batch": "MANUAL-BATCH-001",
+                          "quantity_delta": 10
+                        }
+                      ],
+                      "date": "2026-09-23",
+                      "document_number": "MANUAL-RECEIPT-001",
+                      "id": 19,
+                      "location": "MS-01",
+                      "operation": "receipt",
+                      "quantity": 10,
+                      "sku": "OIL-001"
+                    }
+                  ],
+                  "limit": 50,
+                  "offset": 0,
+                  "total": 1
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/MovementPage"
+                }
+              }
+            },
+            "description": "Страница отфильтрованной истории"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "SKU, объект или запрошенная партия не найдены",
+                    "value": {
+                      "error": {
+                        "code": "unknown_sku",
+                        "details": {
+                          "sku": "UNKNOWN"
+                        },
+                        "message": "SKU does not exist"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SKU, объект или запрошенная партия не найдены"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Невалидные поля или нарушение бизнес-правил",
+                    "value": {
+                      "error": {
+                        "code": "validation_error",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                "quantity"
+                              ],
+                              "message": "Invalid quantity",
+                              "type": "value_error"
+                            }
+                          ]
+                        },
+                        "message": "Request validation failed"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Невалидные поля или нарушение бизнес-правил"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Получить историю движений",
+        "tags": [
+          "movements"
+        ]
+      },
+      "post": {
+        "description": "Атомарная запись и пересчёт остатка. Для новой партии receipt нужны batch, expires_on и unit_price. Для существующей партии метаданные должны совпадать. consume запрещает batch и распределяется по FEFO. Остальные операции требуют batch. return означает возврат на склад, correction — знаковое изменение, не абсолютный остаток. Будущие даты и отрицательные остатки запрещены. Заднее число пересчитывает последующий FEFO; при историческом недостатке вся запись откатывается. Повтор документа возвращает 409.",
+        "operationId": "createMovement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "consume": {
+                  "summary": "Расход с автоматическим FEFO",
+                  "value": {
+                    "date": "2026-09-23",
+                    "document_number": "MANUAL-CONSUME-001",
+                    "location": "MS-01",
+                    "operation": "consume",
+                    "quantity": 3,
+                    "sku": "OIL-001"
+                  }
+                },
+                "correction": {
+                  "summary": "Отрицательная корректировка",
+                  "value": {
+                    "batch": "MANUAL-BATCH-001",
+                    "date": "2026-09-23",
+                    "document_number": "MANUAL-CORRECTION-001",
+                    "location": "MS-01",
+                    "operation": "correction",
+                    "quantity": -1,
+                    "sku": "OIL-001"
+                  }
+                },
+                "receipt": {
+                  "summary": "Приход в новую партию",
+                  "value": {
+                    "batch": "MANUAL-BATCH-001",
+                    "date": "2026-09-23",
+                    "document_number": "MANUAL-RECEIPT-001",
+                    "expires_on": "2027-09-23",
+                    "location": "MS-01",
+                    "operation": "receipt",
+                    "quantity": 10,
+                    "sku": "OIL-001",
+                    "unit_price": 1500
+                  }
+                },
+                "return": {
+                  "summary": "Возврат материала на склад",
+                  "value": {
+                    "batch": "MANUAL-BATCH-001",
+                    "date": "2026-09-23",
+                    "document_number": "MANUAL-RETURN-001",
+                    "location": "MS-01",
+                    "operation": "return",
+                    "quantity": 1,
+                    "sku": "OIL-001"
+                  }
+                },
+                "writeoff": {
+                  "summary": "Списание конкретной партии",
+                  "value": {
+                    "batch": "MANUAL-BATCH-001",
+                    "date": "2026-09-23",
+                    "document_number": "MANUAL-WRITEOFF-001",
+                    "location": "MS-01",
+                    "operation": "writeoff",
+                    "quantity": 2,
+                    "sku": "OIL-001"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/MovementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "allocations": [
+                    {
+                      "batch": "MANUAL-BATCH-001",
+                      "quantity_delta": 10
+                    }
+                  ],
+                  "available_stock": 70,
+                  "current_stock": 70,
+                  "date": "2026-09-23",
+                  "document_number": "MANUAL-RECEIPT-001",
+                  "id": 19,
+                  "location": "MS-01",
+                  "operation": "receipt",
+                  "quantity": 10,
+                  "sku": "OIL-001"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/MovementCreated"
+                }
+              }
+            },
+            "description": "Движение сохранено; остатки включают результат операции"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Некорректный синтаксис JSON",
+                    "value": {
+                      "error": {
+                        "code": "invalid_json",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                1
+                              ],
+                              "message": "JSON decode error",
+                              "type": "json_invalid"
+                            }
+                          ]
+                        },
+                        "message": "Malformed JSON"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Некорректный синтаксис JSON"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "SKU, объект или запрошенная партия не найдены",
+                    "value": {
+                      "error": {
+                        "code": "unknown_sku",
+                        "details": {
+                          "sku": "UNKNOWN"
+                        },
+                        "message": "SKU does not exist"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SKU, объект или запрошенная партия не найдены"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Номер документа уже зарегистрирован",
+                    "value": {
+                      "error": {
+                        "code": "duplicate_document",
+                        "details": {},
+                        "message": "Document number already exists"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Номер документа уже зарегистрирован"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Невалидные поля или нарушение бизнес-правил",
+                    "value": {
+                      "error": {
+                        "code": "validation_error",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                "quantity"
+                              ],
+                              "message": "Invalid quantity",
+                              "type": "value_error"
+                            }
+                          ]
+                        },
+                        "message": "Request validation failed"
+                      }
+                    }
+                  },
+                  "insufficient_stock": {
+                    "summary": "Недостаточно пригодного запаса",
+                    "value": {
+                      "error": {
+                        "code": "insufficient_stock",
+                        "details": {
+                          "available": "10",
+                          "operation_date": "2026-09-23",
+                          "requested": "12"
+                        },
+                        "message": "Consumption exceeds usable stock"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Невалидные поля или нарушение бизнес-правил"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Зарегистрировать движение товара",
+        "tags": [
+          "movements"
+        ]
+      }
+    },
+    "/api/stock": {
+      "get": {
+        "description": "Остатки вычисляются из движений. Показаны пары SKU–объект с заведёнными партиями, включая нулевые остатки. Порядок: SKU, объект. Расход — consume за 90 полных дней до сегодня / 90. Запас в днях рассчитан по available_stock. При нулевом расходе days_of_stock = null. nearest_expiry может быть в прошлом.",
+        "operationId": "listStock",
+        "parameters": [
+          {
+            "description": "Фильтр по SKU. Неизвестный SKU — 404.",
+            "in": "query",
+            "name": "sku",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по SKU. Неизвестный SKU — 404.",
+              "examples": [
+                "OIL-001"
+              ],
+              "title": "Sku"
+            }
+          },
+          {
+            "description": "Код объекта. Неизвестный код — 404.",
+            "in": "query",
+            "name": "location",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Код объекта. Неизвестный код — 404.",
+              "examples": [
+                "MS-01"
+              ],
+              "title": "Location"
+            }
+          },
+          {
+            "description": "Размер страницы; total не зависит от limit.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "description": "Размер страницы; total не зависит от limit.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Количество пропущенных записей после фильтрации.",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Количество пропущенных записей после фильтрации.",
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "items": [
+                    {
+                      "available_stock": 10,
+                      "avg_daily_consumption": 1,
+                      "current_stock": 10,
+                      "days_of_stock": 10,
+                      "expired_stock": 0,
+                      "location": "MS-01",
+                      "name": "Массажное масло",
+                      "nearest_expiry": "2027-09-23",
+                      "sku": "OIL-001",
+                      "unit": "л"
+                    }
+                  ],
+                  "limit": 50,
+                  "offset": 0,
+                  "total": 1
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/StockPage"
+                }
+              }
+            },
+            "description": "Страница складских остатков"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "SKU, объект или запрошенная партия не найдены",
+                    "value": {
+                      "error": {
+                        "code": "unknown_sku",
+                        "details": {
+                          "sku": "UNKNOWN"
+                        },
+                        "message": "SKU does not exist"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SKU, объект или запрошенная партия не найдены"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Невалидные поля или нарушение бизнес-правил",
+                    "value": {
+                      "error": {
+                        "code": "validation_error",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                "quantity"
+                              ],
+                              "message": "Invalid quantity",
+                              "type": "value_error"
+                            }
+                          ]
+                        },
+                        "message": "Request validation failed"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Невалидные поля или нарушение бизнес-правил"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Получить текущие остатки",
+        "tags": [
+          "stock"
+        ]
+      }
+    },
+    "/api/stock/{sku}": {
+      "get": {
+        "description": "Детализация по объектам и партиям, включая пустые партии. Партии упорядочены по годности и ID. Известный товар без партий: locations = []. receipt_documents содержит все приходные документы партии.",
+        "operationId": "getStockBySku",
+        "parameters": [
+          {
+            "description": "Артикул товара.",
+            "in": "path",
+            "name": "sku",
+            "required": true,
+            "schema": {
+              "description": "Артикул товара.",
+              "examples": [
+                "OIL-001"
+              ],
+              "title": "Sku",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "locations": [
+                    {
+                      "available_stock": 10,
+                      "avg_daily_consumption": 1,
+                      "batches": [
+                        {
+                          "batch": "MANUAL-BATCH-001",
+                          "current_stock": 10,
+                          "expired": false,
+                          "expires_on": "2027-09-23",
+                          "receipt_documents": [
+                            "MANUAL-RECEIPT-001"
+                          ],
+                          "received_on": "2026-09-23",
+                          "unit_price": 1500
+                        }
+                      ],
+                      "current_stock": 10,
+                      "days_of_stock": 10,
+                      "expired_stock": 0,
+                      "location": "MS-01",
+                      "name": "Массажное масло",
+                      "nearest_expiry": "2027-09-23",
+                      "sku": "OIL-001",
+                      "unit": "л"
+                    }
+                  ],
+                  "name": "Массажное масло",
+                  "sku": "OIL-001",
+                  "unit": "л"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/StockDetail"
+                }
+              }
+            },
+            "description": "Объекты и партии товара"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "SKU, объект или запрошенная партия не найдены",
+                    "value": {
+                      "error": {
+                        "code": "unknown_sku",
+                        "details": {
+                          "sku": "UNKNOWN"
+                        },
+                        "message": "SKU does not exist"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SKU, объект или запрошенная партия не найдены"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "Невалидные поля или нарушение бизнес-правил",
+                    "value": {
+                      "error": {
+                        "code": "validation_error",
+                        "details": {
+                          "errors": [
+                            {
+                              "location": [
+                                "body",
+                                "quantity"
+                              ],
+                              "message": "Invalid quantity",
+                              "type": "value_error"
+                            }
+                          ]
+                        },
+                        "message": "Request validation failed"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Невалидные поля или нарушение бизнес-правил"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Получить остатки и партии товара",
+        "tags": [
+          "stock"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Не обращается к базе данных. Подтверждает, что процесс отвечает по HTTP.",
+        "operationId": "getLiveness",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "ok"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/LiveStatus"
+                }
+              }
+            },
+            "description": "Процесс работает"
+          }
+        },
+        "summary": "Проверить процесс",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Проверяет подключение к PostgreSQL и наличие таблицы alembic_version.",
+        "operationId": "getReadiness",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "ready"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyStatus"
+                }
+              }
+            },
+            "description": "База доступна"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "summary": "База временно недоступна",
+                    "value": {
+                      "error": {
+                        "code": "database_unavailable",
+                        "details": {},
+                        "message": "Database temporarily unavailable"
+                      }
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "База временно недоступна"
+          }
+        },
+        "summary": "Проверить готовность базы",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "description": "Текущий сервер API",
+      "url": "/"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Регистрация и история складских движений.",
+      "name": "movements"
+    },
+    {
+      "description": "Вычисляемые остатки по объектам и партиям.",
+      "name": "stock"
+    },
+    {
+      "description": "Детерминированный прогноз и объяснение закупки.",
+      "name": "forecast"
+    },
+    {
+      "description": "Дефицит, сроки годности и отсутствие движения.",
+      "name": "alerts"
+    },
+    {
+      "description": "Проверка процесса и готовности базы данных.",
+      "name": "health"
+    }
+  ]
+}
